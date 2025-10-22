@@ -27,11 +27,11 @@ def rubber_band_filter(ts, Vs, freq, *args):
     Required:
         ts    : 1D array of times (monotonic, ~uniform)
         Vs    : 1D array of signal (same length as ts)
-        freq  : cutoff frequency (Hz)
+        freq  : cutoff frequency 
         
     Optional name–value parameters (MATLAB-style):
         'exitmode' : 'fixed' or 'thresh' (default 'thresh')
-        'tol'      : tolerance for 'thresh' (default 1e-7; ignored for 'fixed')
+        'tol'      : tolerance for 'thresh' (default 1e-5; ignored for 'fixed')
         'npad'     : padding count (default 1; right-side mirror)
         'niter'    : CG iterations (default 30)
         'ws'       : weights vector for valid region (default ones; 0 where Vs is NaN)
@@ -47,7 +47,7 @@ def rubber_band_filter(ts, Vs, freq, *args):
 
     # ---- defaults ----
     exitMode = 'thresh'
-    tol      = 1e-7
+    tol      = 1e-5
     Npad     = 1
     Niter    = 30
     ws       = np.ones_like(Vs, dtype=float)
@@ -153,7 +153,11 @@ def rubber_band_filter(ts, Vs, freq, *args):
     r = b - convf(x)
     p = r.copy()
     tiny   = np.finfo(float).tiny
-    bnorm2 = float(np.real(np.vdot(b, b)))
+    b_t   = _ToV(b, fss, g)
+    valid = slice(0, len(Vso))                      
+    bnorm2 = float(np.std(b_t[valid], ddof=1))      
+    if not np.isfinite(bnorm2) or bnorm2 <= 0:
+        bnorm2 = np.finfo(float).eps
 
 
     dv = np.zeros(Niter, dtype=float)   # normalized residual^2
@@ -176,7 +180,9 @@ def rubber_band_filter(ts, Vs, freq, *args):
             bk = 0.0
         p = r + bk * p
 
-        dv[ii] = np.real(np.vdot(r, r)) / (bnorm2 if bnorm2 > tiny else tiny)
+        Ax   = convf(x)
+        Ax_t = _ToV(Ax, fss, g)
+        dv[ii] = float(np.max(np.abs(Ax_t[valid] - b_t[valid])) / bnorm2)
         if exitMode.lower() == 'thresh' and dv[ii] <= tol:
             dv = dv[:ii+1]
             break

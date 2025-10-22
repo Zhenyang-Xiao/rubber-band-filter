@@ -14,10 +14,10 @@ function [Vf, info] = Rubber_Band_Filter(ts, Vs, freq, varargin)
 % Required:
 %   ts   : time vector (monotonic, ~uniform)
 %   Vs   : signal vector (same length as ts)
-%   freq : cutoff frequency (Hz)
+%   freq : cutoff frequency
 %
 % Exit modes:
-%   'thresh' (default): break when real(r'*r)/real(b'*b) <= tol  (tol default 1e-7)
+%   'thresh' (default): break when real(r'*r)/real(b'*b) <= tol  (tol default 1e-5)
 %   'fixed'           : run exactly Niter iterations
 
 % Defaults implement right-side mirror padding with padded weight
@@ -25,7 +25,7 @@ function [Vf, info] = Rubber_Band_Filter(ts, Vs, freq, varargin)
 
 % Optional parameters:
 %   'exitmode': fixed or threshold
-%   'tol'     : none for fixed mode or tolorence for threshold mode
+%   'tol'     : none for fixed mode or tolerance for threshold mode
 %   'npad'    : number of extra padding regions (default = 1; right-side mirror)
 %   'niter'   : number of CG iterations (default = 30)
 %   'ws'      : weights for valid region (default = 1 except 0 where Vs is NaN)
@@ -36,13 +36,13 @@ function [Vf, info] = Rubber_Band_Filter(ts, Vs, freq, varargin)
 
     % ---- defaults ----
     exitMode = 'thresh';
-    tol      = 1e-7;
+    tol      = 1e-5;
     Npad     = 1;
     Niter    = 30;
     ws       = ones(size(Vs));
 
     % case-by-case varargin scan (key at i, value at i+1)
-    for i1 = 1:length(varargin)
+    for i1 = 1:2:length(varargin)
         key = varargin{i1};
         if ischar(key) || (isstring(key) && isscalar(key))
             key = lower(strtrim(char(key)));
@@ -118,7 +118,8 @@ function [Vf, info] = Rubber_Band_Filter(ts, Vs, freq, varargin)
     rng('default'); x0 = zeros(size(P(g))); x = x0;
     r = b - convf(x);
     p = r;
-    bnorm2 = real(b' * b);
+    b_t=ToV(b);
+    bnorm2=std(b_t(1:length(Vso)));
 
     dv = zeros(1, Niter);                   % normalized residual^2
     for ii = 1:Niter
@@ -135,8 +136,8 @@ function [Vf, info] = Rubber_Band_Filter(ts, Vs, freq, varargin)
         end
         % bk = 0;
         p = r + bk * p;
-
-        dv(ii) = real(r' * r) / bnorm2;
+        Ax = convf(x); Ax_t=ToV(Ax);
+        dv(ii) = max(abs(Ax_t(1:length(Vso))-b_t(1:length(Vso)))) / bnorm2;
 
         if strcmpi(exitMode, 'thresh')
             if dv(ii) <= tol
