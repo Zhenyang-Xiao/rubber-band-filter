@@ -8,53 +8,53 @@ This technique applies an optimal padding scheme during the filtering process an
 
 ###### matlab version:
 
-&nbsp;	Vf = Rubber\_Band\_Filter(ts, Vs, freq)
+ 	Vf = Rubber\_Band\_Filter(ts, Vs, freq)
 
-&nbsp;	\[Vf,info] = Rubber\_Band\_Filter(ts, Vs, freq)
+ 	\[Vf,info] = Rubber\_Band\_Filter(ts, Vs, freq)
 
-&nbsp;	Vf = Rubber\_Band\_Filter(ts, Vs, freq, 'exitmode','fixed')
+ 	Vf = Rubber\_Band\_Filter(ts, Vs, freq, 'exitmode','fixed')
 
-&nbsp;	Vf = Rubber\_Band\_Filter(ts, Vs, freq, 'exitmode','thresh','tol',1e-9)
+ 	Vf = Rubber\_Band\_Filter(ts, Vs, freq, 'exitmode','thresh','tol',1e-9)
 
-&nbsp;	Vf = Rubber\_Band\_Filter(ts, Vs, freq, 'Niter',10)
+ 	Vf = Rubber\_Band\_Filter(ts, Vs, freq, 'Niter',10)
 
 ###### python version:
 
-&nbsp;       Vf, info               = rubber\_band\_filter(ts, Vs, freq)
+        Vf, info               = rubber\_band\_filter(ts, Vs, freq)
 
-&nbsp;       Vf, info               = rubber\_band\_filter(ts, Vs, freq, 'exitmode','fixed')
+        Vf, info               = rubber\_band\_filter(ts, Vs, freq, 'exitmode','fixed')
 
-&nbsp;       Vf, info               = rubber\_band\_filter(ts, Vs, freq, 'exitmode','thresh','tol',1e-9)
+        Vf, info               = rubber\_band\_filter(ts, Vs, freq, 'exitmode','thresh','tol',1e-9)
 
-&nbsp;       Vf, info               = rubber\_band\_filter(ts, Vs, freq, 'Niter', 10)
+        Vf, info               = rubber\_band\_filter(ts, Vs, freq, 'Niter', 10)
 
 ##### Input for the function:
 
 ###### Required inputs:
 
-&nbsp;	ts: time axis of the signal to be processed.
+ 	ts: time axis of the signal to be processed.
 
-&nbsp;	Vs: signal to be processed.
+ 	Vs: signal to be processed.
 
-&nbsp;	fs: cut off frequency
+ 	fs: cut-off frequency.
 
 ###### Optional inputs:
 
-&nbsp;	exitmode: fixed or threshold, fixed means exit the CG loop after all iterations, threshold means exit the CG loop once the tolerance is reached. 
+ 	exitmode: fixed or threshold, ‘fixed’ exits the CG loop after all iterations; ‘threshold’ exits once the tolerance is reached.
 
-&nbsp;	tol     : none for fixed mode or tolerance for threshold mode
+ 	tol     : not used in fixed mode; tolerance value in threshold mode.
 
-&nbsp;	npad    : number of extra padding regions (default = 1)
+ 	npad    : number of extra padding regions (default = 1).
 
-&nbsp;	niter   : number of CG iterations (default = 30)
+ 	niter   : number of CG iterations (default = 30).
 
-&nbsp;	ws      : weights for valid region (default = 1 except 0 where Vs is NaN), only necessary when the rubber band filter can not give a good result, can be a weight depended on the SNR to provide better filtering results.
+ 	ws      : weights for valid region (default = 1 except 0 where Vs is NaN), only necessary when the default rubber band filter does not give a good result, can be a weight depending on the SNR to provide better filtering results.
 
 ##### Output:
 
-&nbsp;	Vf   : filtered signal
+ 	Vf   : filtered signal.
 
-&nbsp;	info : useful information including parameters used, convergence status, exit mode, and more.
+ 	info : useful information including parameters used, convergence status, exit mode, and more.
 
 By default, the padded region uses 0.03 \* tukeywindow(0.2, length(Vs)). The function does not provide an optional input to modify this, but it can be adjusted manually (line 76–77 in MATLAB, or line 103 in Python).
 
