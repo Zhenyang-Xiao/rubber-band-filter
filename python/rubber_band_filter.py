@@ -149,7 +149,8 @@ def rubber_band_filter(ts, Vs, freq, *args):
     # ---- CG ----
     b = convf(P)
     x0 = P[g].copy(); x = x0            # keep intent
-    np.random.seed(0); x0 = np.zeros_like(P[g]); x = x0
+    # np.random.seed(0); 
+    x0 = np.zeros_like(P[g]); x = x0
     r = b - convf(x)
     p = r.copy()
     tiny   = np.finfo(float).tiny

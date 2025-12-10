@@ -66,7 +66,7 @@ function [Vf, info] = Rubber_Band_Filter(ts, Vs, freq, varargin)
         Vs(~validMask) = interp1(ts(validMask), Vs(validMask), ts(~validMask), 'linear', 'extrap');
     end
 
-    % ---- inline padding (same spirit as your original) ----
+    % ---- inline padding ----
     Vso = Vs;                           % keep original for cropping
     if Npad == 0
         % no padding
@@ -112,10 +112,11 @@ function [Vf, info] = Rubber_Band_Filter(ts, Vs, freq, varargin)
         co = co_full( ko - (length(g)-1)/2 : ko + (length(g)-1)/2 );
     end
 
-    % ---- CG (your exact sequence) ----
+    % ---- CG ----
     b = convf(P);
     x0 = P(g); x = x0;                      %#ok<NASGU> preserve intent
-    rng('default'); x0 = zeros(size(P(g))); x = x0;
+    % rng('default'); 
+    x0 = zeros(size(P(g))); x = x0;
     r = b - convf(x);
     p = r;
     b_t=ToV(b);
